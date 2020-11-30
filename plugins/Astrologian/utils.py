@@ -71,12 +71,15 @@ async def sub_event(key):
 # copy from https://github.com/Bluefissure/OtterBot
 # 针对每个qq用户，通过QQ号和日期生成一个种子
 async def get_seed(QQnum):
-    today = datetime.date.today()
-    formatted_today = int(today.strftime('%y%m%d'))
-    strnum = str(formatted_today * QQnum)
+    # 众所周知ff14玩家的一天从国内23:00开始
+    utc_today = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    ffxiv_today = utc_today.astimezone(datetime.timezone(datetime.timedelta(hours=7)))
+
+    formatted_ffxiv_today = int(ffxiv_today.strftime('%y%m%d'))
+    str_num = str(formatted_ffxiv_today * QQnum)
 
     md5 = hashlib.md5()
-    md5.update(strnum.encode('utf-8'))
+    md5.update(str_num.encode('utf-8'))
     res = md5.hexdigest()
 
     return int(res.upper(), 16) % 100 + 1
