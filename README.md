@@ -1,0 +1,2 @@
+# onebot_Astrologian_FFXIV
+ 一个基于nonebot的重构的FFXIVQQ机器人占卜插件
