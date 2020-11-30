@@ -27,7 +27,7 @@ async def luck(session: CommandSession):
     hint = await utils.get_hint(luck_number, luck_job, luck_event, unlucky_event, stain)
 
     message = at + "\n运势: " + luck_number + "% 幸运职业: " \
-              + luck_job + "\n宜: " + luck_event + " 忌: " + unlucky_event + "幸运油漆: " + stain + "\n" + hint
+              + luck_job + "\n宜: " + luck_event + " 忌: " + unlucky_event + " 幸运染剂: " + stain + "\n" + hint
     # print(r.randint(0, len(EVENT_LIST) - 2))
     await session.send(message)
 
