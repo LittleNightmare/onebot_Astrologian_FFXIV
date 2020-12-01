@@ -63,7 +63,7 @@ async def get_stain():
 async def sub_event(key):
     if key == "舞者":
         partner = war + magic
-        return key + "-->舞伴: " + random.choice(partner)
+        return key + "-->》 最佳舞伴: " + random.choice(partner)
     else:
         return key
 

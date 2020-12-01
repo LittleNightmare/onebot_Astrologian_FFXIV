@@ -7,7 +7,7 @@ from . import utils
 
 
 # on_command 装饰器将函数声明为一个命令处理器
-@on_command('luck', aliases=('占卜', 'zhanbu'), permission=EVERYBODY)
+@on_command('luck', aliases=('占卜', 'zhanbu'), permission=EVERYBODY, only_to_me=False)
 async def luck(session: CommandSession):
     if len(utils.war or utils.magic or utils.land or utils.hand or utils.stains) == 0:
         await utils.initialization()
@@ -26,8 +26,8 @@ async def luck(session: CommandSession):
     stain = r.choice(utils.stains)
     hint = await utils.get_hint(luck_number, luck_job, luck_event, unlucky_event, stain)
 
-    message = at + "\n运势: " + luck_number + "% 幸运职业: " \
-              + luck_job + "\n宜: " + luck_event + " 忌: " + unlucky_event + " 幸运染剂: " + stain + "\n" + hint
+    message = at + "\n运势: " + luck_number + "%  幸运职业: " \
+              + luck_job + "\n宜: " + luck_event + "  忌: " + unlucky_event + "  幸运染剂: " + stain + "\n" + hint
     # print(r.randint(0, len(EVENT_LIST) - 2))
     await session.send(message)
 
