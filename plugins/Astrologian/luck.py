@@ -16,14 +16,21 @@ async def luck(session: CommandSession):
     # 生成当天种子
     r = random.Random(await utils.get_seed(caller_qq_number))
     # content
+    # @QQ
     at = MessageSegment(type_="at", data={"qq": caller_qq_number})
+    # 运势 1-100
     luck_number = str(r.randint(1, 100))
+    # 职业 ff14全部职业
     luck_job = await utils.sub_event(str(r.choice(utils.war + utils.magic + utils.land + utils.hand)))
+    # 宜
     luck_event = r.choice(utils.EVENT_LIST)
+    # 忌
     unlucky_event = utils.EVENT_LIST.copy()
     unlucky_event.remove(luck_event)
     unlucky_event = r.choice(unlucky_event)
+    # 染剂
     stain = r.choice(utils.stains)
+    # 一言
     hint = await utils.get_hint(luck_number, luck_job, luck_event, unlucky_event, stain)
 
     message = at + "\n运势: " + luck_number + "%  幸运职业: " \

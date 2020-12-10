@@ -3,33 +3,34 @@ import datetime
 import hashlib
 import random
 from pathlib import Path
+import json
 
 PATH_Astrologian = Path(__file__).parent.absolute()
-# TODO 写子项目
-EVENT_LIST = ["诸事", "优雷卡", "刷外观", "找CP", "偷情", "抓奸",
-              "开荒", "挂机", "挖宝", "采集", "钓鱼王", "PVP", "逛RP店",
-              "日随", "装修", "蹲房", "练级", "拍照", "刷危命",
-              "炒股", "渡劫", "出警", "刷坐骑", "刷幻化", "幻卡", "喷风",
-              "跳跳乐", "赛鸟", "天宫死宫", "快刀一闪", "无"]
+
+EVENT_LIST = []
+
+EVENT_LIST_CONTENT = {}
 
 war, magic, land, hand, stains = [], [], [], [], []
 
 
 async def initialization():
-    global war, magic, land, hand, stains
-    # create unchange vars
+    global war, magic, land, hand, stains, EVENT_LIST_CONTENT, EVENT_LIST
+    # create constant vars
     war, magic, land, hand = await get_jobs()
     stains = await get_stain()
-    print("占星术士成功拿到卡牌")
+    EVENT_LIST_CONTENT = await _get_event()
+    EVENT_LIST = list(EVENT_LIST_CONTENT.keys())
+    print("占星术士成功拿到卡牌(启动初始化完成)")
 
 
 # 读取职业列表，计划返回4组list
-async def get_jobs():
+async def get_jobs() -> tuple:
     war_jobs = []
     magic_jobs = []
     land_jobs = []
     hand_jobs = []
-    with open(PATH_Astrologian / "data/ClassJob.csv", mode="r", encoding="utf-8") as f:
+    with open(PATH_Astrologian / "data" / "ClassJob.csv", mode="r", encoding="utf-8") as f:
         jobs_csv = csv.reader(f)
         for job in jobs_csv:
             if job[4] == "战斗精英":
@@ -48,7 +49,7 @@ async def get_jobs():
 
 
 # 读取染剂列表
-async def get_stain():
+async def get_stain() -> list:
     stains = []
     with open(PATH_Astrologian / "data" / "StainTransient.csv", mode="r", encoding="utf-8") as f:
         stains_csv = csv.reader(f)
@@ -59,24 +60,34 @@ async def get_stain():
     return stains
 
 
+# 读取事件列表，以及对应一言
+async def _get_event() -> dict:
+    with open(PATH_Astrologian / "data" / "events.json", mode="r", encoding="utf-8") as f:
+        events = json.load(f)
+
+    # 每个event有一个组list，其中按从大到小顺序储存了对应的一言，默认luck为50，unluck为0
+    # 为了后续判断，请将luck_event的数字满足 50<=num<=100; 而unluck满足 0<=num<50
+    return events
+
+
 # 特殊职业创建特殊语句
-async def sub_event(key):
+async def sub_event(key) -> str:
     if key == "舞者":
         partner = war + magic
-        return key + "-->》 最佳舞伴: " + random.choice(partner)
+        return key + "--> 最佳舞伴: " + random.choice(partner)
     else:
         return key
 
 
 # copy from https://github.com/Bluefissure/OtterBot
 # 针对每个qq用户，通过QQ号和日期生成一个种子
-async def get_seed(QQnum):
+async def get_seed(qq_num) -> int:
     # 众所周知ff14玩家的一天从国内23:00开始
     utc_today = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
     ffxiv_today = utc_today.astimezone(datetime.timezone(datetime.timedelta(hours=7)))
 
     formatted_ffxiv_today = int(ffxiv_today.strftime('%y%m%d'))
-    str_num = str(formatted_ffxiv_today * QQnum)
+    str_num = str(formatted_ffxiv_today * qq_num)
 
     md5 = hashlib.md5()
     md5.update(str_num.encode('utf-8'))
@@ -85,16 +96,36 @@ async def get_seed(QQnum):
     return int(res.upper(), 16) % 100 + 1
 
 
-async def get_hint(luck_number, luck_job, luck_event, unlucky_event, stain):
-    # TODO 写个switch
+# 通过传入的参数来确定一言
+async def get_hint(luck_number, luck_job, luck_event, unlucky_event, stain) -> str:
     luck_number = int(luck_number)
+    # 根据一些特殊值生成语句
+    special_event = ""
     if luck_number > 95:
-        return "是欧皇(*′▽｀)ノノ"
+        special_event += "是欧皇(*′▽｀)ノノ\n"
     elif luck_number < 5:
-        return "是非酋︿(￣︶￣)︿"
-    elif luck_event == "诸事":
-        return "萨纳兰今天也是艳阳高照啊(￣︶￣)"
-    elif unlucky_event == "诸事":
-        return "今天是摸鱼的一天！"
+        special_event += "是非酋︿(￣︶￣)︿\n"
+    elif luck_job == "占星术士":
+        if luck_number > 80:
+            special_event += "你抽卡必定日月星三连(￣︶￣)\n"
+        elif luck_number < 20:
+            special_event += "即使同色，也要勇敢的挑战命运ヾ(◍°∇°◍)ﾉﾞ\n"
+    elif luck_job == "忍者":
+        if luck_number > 70:
+            special_event += "Duang Duang Duang 天地人一气呵成\n"
+        elif luck_number < 20:
+            special_event += "兔兔在头顶的样子很可爱的(✺ω✺)"
+
+    if luck_number >= 50:
+        events = EVENT_LIST_CONTENT[luck_event]
     else:
-        return "诶诶，咱没有料到呢？肯定是笨蛋梦魇偷懒了[○･｀Д´･ ○]"
+        events = EVENT_LIST_CONTENT[unlucky_event]
+
+    # 根据每个event储存的一组list，来选择返回一言，要求达到返回第一个小于luck_number(运势)的值
+    event_content = ""
+    for content in events:
+        if content[0] <= luck_number:
+            event_content = content[1]
+    if event_content == "":
+        event_content = "诶诶，咱没有料到呢？肯定是笨蛋梦魇偷懒了[○･｀Д´･ ○]"
+    return special_event + event_content
