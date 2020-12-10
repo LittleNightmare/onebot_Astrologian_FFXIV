@@ -84,7 +84,7 @@ async def sub_event(key) -> str:
 async def get_seed(qq_num) -> int:
     # 众所周知ff14玩家的一天从国内23:00开始
     utc_today = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
-    ffxiv_today = utc_today.astimezone(datetime.timezone(datetime.timedelta(hours=7)))
+    ffxiv_today = utc_today.astimezone(datetime.timezone(datetime.timedelta(hours=9)))
 
     formatted_ffxiv_today = int(ffxiv_today.strftime('%y%m%d'))
     str_num = str(formatted_ffxiv_today * qq_num)
