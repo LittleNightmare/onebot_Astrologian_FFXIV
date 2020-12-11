@@ -121,11 +121,12 @@ async def get_hint(luck_number, luck_job, luck_event, unlucky_event, stain) -> s
     else:
         events = EVENT_LIST_CONTENT[unlucky_event]
 
-    # 根据每个event储存的一组list，来选择返回一言，要求达到返回第一个小于luck_number(运势)的值
+    # 根据每个event储存的一组list，来选择返回一言，要求达到第一个小于luck_number(运势)的值跳出
     event_content = ""
     for content in events:
         if content[0] <= luck_number:
             event_content = content[1]
+            break
     if event_content == "":
         event_content = "诶诶，咱没有料到呢？肯定是笨蛋梦魇偷懒了[○･｀Д´･ ○]"
     return special_event + event_content
