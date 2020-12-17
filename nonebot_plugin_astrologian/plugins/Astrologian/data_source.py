@@ -4,6 +4,7 @@ import hashlib
 import random
 from pathlib import Path
 import json
+from nonebot.log import logger
 
 PATH_Astrologian = Path(__file__).parent.absolute()
 
@@ -21,7 +22,7 @@ async def initialization():
     stains = await get_stain()
     EVENT_LIST_CONTENT = await _get_event()
     EVENT_LIST = list(EVENT_LIST_CONTENT.keys())
-    print("占星术士成功拿到卡牌(启动初始化完成)")
+    logger.info("占星术士成功拿到卡牌(启动初始化完成)")
 
 
 # 读取职业列表，计划返回4组list
@@ -130,3 +131,35 @@ async def get_hint(luck_number, luck_job, luck_event, unlucky_event, stain) -> s
     if event_content == "":
         event_content = "诶诶，咱没有料到呢？肯定是笨蛋梦魇偷懒了[○･｀Д´･ ○]"
     return special_event + event_content
+
+
+async def luck_daily(user_id: int, redraw=False) -> str:
+    if len(war or magic or land or hand or stains) == 0:
+        await initialization()
+    # 拿到命令使用者的qq号
+    caller_qq_number = user_id
+    # 生成当天种子
+    r = random.Random(await get_seed(caller_qq_number + (1 if redraw else 0)))
+    # content
+    # @QQ
+    at = "[CQ:at,qq=%s]" % caller_qq_number
+    # 运势 1-100
+    luck_number = str(r.randint(1, 100))
+    # 职业 ff14全部职业
+    luck_job = await sub_event(str(r.choice(war + magic + land + hand)))
+    # 宜
+    luck_event = r.choice(EVENT_LIST)
+    # 忌
+    unlucky_event = EVENT_LIST.copy()
+    unlucky_event.remove(luck_event)
+    unlucky_event = r.choice(unlucky_event)
+    # 染剂
+    stain = r.choice(stains)
+    # 一言
+    hint = await get_hint(luck_number, luck_job, luck_event, unlucky_event, stain)
+
+    message = at + "\n运势: " + luck_number + "%  幸运职业: " \
+              + luck_job + "\n宜: " + luck_event + "  忌: " + unlucky_event + "  幸运染剂: " + stain + "\n" + hint
+    # print(r.randint(0, len(EVENT_LIST) - 2))
+
+    return message
