@@ -1,1 +1,1 @@
-nonebot==1.8.0
+nonebot2==2.0.0a7

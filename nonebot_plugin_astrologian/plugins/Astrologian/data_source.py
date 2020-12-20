@@ -142,7 +142,7 @@ async def luck_daily(user_id: int, redraw=False) -> str:
     r = random.Random(await get_seed(caller_qq_number + (1 if redraw else 0)))
     # content
     # @QQ
-    at = "[CQ:at,qq=%s]" % caller_qq_number
+    # at = "[CQ:at,qq=%s]" % caller_qq_number
     # 运势 1-100
     luck_number = str(r.randint(1, 100))
     # 职业 ff14全部职业
@@ -158,7 +158,7 @@ async def luck_daily(user_id: int, redraw=False) -> str:
     # 一言
     hint = await get_hint(luck_number, luck_job, luck_event, unlucky_event, stain)
 
-    message = at + "\n运势: " + luck_number + "%  幸运职业: " \
+    message = "\n运势: " + luck_number + "%  幸运职业: " \
               + luck_job + "\n宜: " + luck_event + "  忌: " + unlucky_event + "  幸运染剂: " + stain + "\n" + hint
     # print(r.randint(0, len(EVENT_LIST) - 2))
 
