@@ -1,19 +1,22 @@
-from .config import Config
 import nonebot
-
-global_config = nonebot.get_driver().config
-plugin_config = Config(**global_config.dict())
 from nonebot import on_command
 from nonebot.adapters.cqhttp import Bot, Event
 
+from .config import Config
 from .data_source import luck_daily
 
+global_config = nonebot.get_driver().config
+plugin_config = Config(**global_config.dict())
 luck = on_command("luck", aliases={"占卜", "zhanbu"}, temp=False, priority=5)
+group: bool = True
 
 
 @luck.handle()
 async def handle_first_receive(bot: Bot, event: Event, state: dict):
-    args = str(event.message).strip().split()
+    # 通过是否为group判读信息结构
+    global group
+    group = True if event.sub_type.find("normal") != -1 else plugin_config.same_message_structure
+    args: list = str(event.message).strip().split()
     state["help"] = False
     state["redraw"] = False
     state["test"] = ""
@@ -26,13 +29,13 @@ async def handle_first_receive(bot: Bot, event: Event, state: dict):
             state["test"] = args[1]
 
     else:
-        await luck.send(await luck_daily(event.user_id, False), at_sender=True)
+        await luck.send(await luck_daily(user_id=event.user_id, redraw=False, group_message=group), at_sender=group)
 
 
 @luck.got("redraw")
 async def ordered_redraw(bot: Bot, event: Event, state: dict):
     if state["redraw"]:
-        await luck.finish(await luck_daily(event.user_id, True), at_sender=True)
+        await luck.finish(await luck_daily(user_id=event.user_id, redraw=True, group_message=group), at_sender=group)
 
 
 @luck.got("help")
@@ -47,4 +50,5 @@ async def luck_help(bot: Bot, event: Event, state: dict):
 async def luck_test(bot: Bot, event: Event, state: dict):
     if state["test"] != "":
         print("test", ":", state["test"])
-        await luck.finish(await luck_daily(int(state["test"]), False), at_sender=True)
+        await luck.finish(await luck_daily(user_id=int(state["test"]), redraw=False, group_message=group),
+                          at_sender=group)

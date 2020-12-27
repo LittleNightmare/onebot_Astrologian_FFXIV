@@ -8,9 +8,9 @@ from nonebot.log import logger
 
 PATH_Astrologian = Path(__file__).parent.absolute()
 
-EVENT_LIST = []
+EVENT_LIST: list = []
 
-EVENT_LIST_CONTENT = {}
+EVENT_LIST_CONTENT: dict = {}
 
 war, magic, land, hand, stains = [], [], [], [], []
 
@@ -72,7 +72,7 @@ async def _get_event() -> dict:
 
 
 # 特殊职业创建特殊语句
-async def sub_event(key) -> str:
+async def sub_event(key: str) -> str:
     if key == "舞者":
         partner = war + magic
         return key + "--> 最佳舞伴: " + random.choice(partner)
@@ -82,7 +82,7 @@ async def sub_event(key) -> str:
 
 # copy from https://github.com/Bluefissure/OtterBot
 # 针对每个qq用户，通过QQ号和日期生成一个种子
-async def get_seed(qq_num) -> int:
+async def get_seed(qq_num: int) -> int:
     # 众所周知ff14玩家的一天从国内23:00开始
     utc_today = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
     ffxiv_today = utc_today.astimezone(datetime.timezone(datetime.timedelta(hours=9)))
@@ -98,10 +98,10 @@ async def get_seed(qq_num) -> int:
 
 
 # 通过传入的参数来确定一言
-async def get_hint(luck_number, luck_job, luck_event, unlucky_event, stain) -> str:
+async def get_hint(luck_number: str, luck_job: str, luck_event: str, unlucky_event: str, stain: str) -> str:
     luck_number = int(luck_number)
     # 根据一些特殊值生成语句
-    special_event = ""
+    special_event: str = ""
     if luck_number > 95:
         special_event += "是欧皇(*′▽｀)ノノ\n"
     elif luck_number < 5:
@@ -133,33 +133,50 @@ async def get_hint(luck_number, luck_job, luck_event, unlucky_event, stain) -> s
     return special_event + event_content
 
 
-async def luck_daily(user_id: int, redraw=False) -> str:
+async def luck_daily(user_id: int, redraw: bool = False, group_message: bool = True) -> str:
+    """
+    :param user_id caller's QQ
+    :param redraw make other result if True
+    :param group_message create a different return if True
+    :return message that send to caller
+    """
+
     if len(war or magic or land or hand or stains) == 0:
         await initialization()
-    # 拿到命令使用者的qq号
-    caller_qq_number = user_id
-    # 生成当天种子
-    r = random.Random(await get_seed(caller_qq_number + (1 if redraw else 0)))
+
+    # 生成当天种子, 重抽判断
+    r = random.Random(await get_seed(user_id * (user_id if redraw else 1)))
     # content
-    # @QQ
+    # @QQ 不需要，nonebot有命令
     # at = "[CQ:at,qq=%s]" % caller_qq_number
     # 运势 1-100
-    luck_number = str(r.randint(1, 100))
+    luck_number: str = str(r.randint(1, 100))
     # 职业 ff14全部职业
-    luck_job = await sub_event(str(r.choice(war + magic + land + hand)))
+    luck_job: str = await sub_event(str(r.choice(war + magic + land + hand)))
     # 宜
     luck_event = r.choice(EVENT_LIST)
     # 忌
-    unlucky_event = EVENT_LIST.copy()
-    unlucky_event.remove(luck_event)
-    unlucky_event = r.choice(unlucky_event)
+    unlucky_event_list: list = EVENT_LIST.copy()
+    unlucky_event_list.remove(luck_event)
+    unlucky_event: str = r.choice(unlucky_event_list)
+    # 宜忌互锁 诸事 与 无
+    if luck_event == "诸事":
+        unlucky_event = "无"
+    elif luck_event == "无":
+        unlucky_event = "诸事"
     # 染剂
-    stain = r.choice(stains)
+    stain: str = r.choice(stains)
     # 一言
-    hint = await get_hint(luck_number, luck_job, luck_event, unlucky_event, stain)
+    hint: str = await get_hint(luck_number, luck_job, luck_event, unlucky_event, stain)
+    # 群消息特殊化
+    if group_message:
+        message: str = "\n运势: " + luck_number + "%  幸运职业: " + luck_job + \
+                       "\n宜: " + luck_event + "  忌: " + unlucky_event + "  幸运染剂: " + stain + "\n" + hint
+    else:
+        message: str = "运势: " + luck_number + \
+                       "%\n幸运职业: " + luck_job + \
+                       "\n宜: " + luck_event + "  忌: " + unlucky_event + "\n幸运染剂: " + stain + "\n" + hint
 
-    message = "\n运势: " + luck_number + "%  幸运职业: " \
-              + luck_job + "\n宜: " + luck_event + "  忌: " + unlucky_event + "  幸运染剂: " + stain + "\n" + hint
     # print(r.randint(0, len(EVENT_LIST) - 2))
 
     return message
