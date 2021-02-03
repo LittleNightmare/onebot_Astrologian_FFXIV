@@ -162,8 +162,8 @@ async def luck_daily(user_id: int, redraw: bool = False, group_message: bool = T
     # 宜忌互锁 诸事 与 无
     if luck_event == "诸事":
         unlucky_event = "无"
-    elif luck_event == "无":
-        unlucky_event = "诸事"
+    elif unlucky_event == "诸事":
+        luck_event = "无"
     # 染剂
     stain: str = r.choice(stains)
     # 一言
