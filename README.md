@@ -35,7 +35,7 @@ TODO
 
       我相信看这个的应该都是已经领养好獭獭的用户了吧？如果不是看[文档](https://yimo0908.github.io/easy-build-otterbot/)
   
-      示例如下：
+      Mirai示例如下：
   
           ws_reverse: 
           - enable: true
