@@ -6,6 +6,8 @@
 
 可以有一次重抽的机会
 
+建议有一定Python基础的用户使用，需要参考Nonebot2[官方文档](https://v2.nonebot.dev/)
+
 ## 用法
 
 发送命令`/luck`，`/zhanbu`，或者`/占卜`
@@ -14,11 +16,21 @@
 
 后面加`help`来获得帮助，如`/zhanbu help`
 
-## 部署
-TODO
-1. 创建`.env.dev`在目录，并写入配置
-2. run your bot using `nb run` .    
+## 第一次使用Nonebot2的用户
 
+1. 阅读[官方文档](https://v2.nonebot.dev/)来了解基础操作
+2. 参考官方文档里的[基本配置](https://v2.nonebot.dev/guide/basic-configuration.html)
+3. 建议创建`.env`和`.env.dev`在目录，并参考上面的基本配置来写入配置
+4. 接下来参考下面的部分，运行机器人
+
+### 附录
+如果参考[官方步骤](https://v2.nonebot.dev/guide/installation.html)进行安装后，并看[开始使用](https://v2.nonebot.dev/guide/getting-started.html)进行一个`nb create`后，可参考如下步骤使用本插件
+
+1. 参考官方文档里的[基本配置](https://v2.nonebot.dev/guide/basic-configuration.html)修改`.env`和`.env.dev`或保留配置不动
+2. 将clone本项目的`nonebot_plugin_astrologian`复制到你创建机器人的位置
+3. 添加`nonebot.load_plugins("nonebot_plugin_astrologian/plugins")`在`bot.py`里的第7行`nonebot.load_builtin_plugins()`后，第10行`nonebot.run()`前
+4. 然后执行`pip install pydantic`(注意：这里默认你已经安装了python以及nonebot2，没有的话可以参考)(这里等效`狒狒也能看懂的占卜插件部署指南`的第三步)
+5. 从`狒狒也能看懂的占卜插件部署指南`的第四步开始执行
 ## 狒狒也能看懂的占卜插件部署指南
 
 1. 安装[python](https://www.python.org/downloads/)
