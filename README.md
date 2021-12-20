@@ -43,7 +43,7 @@
 
 4. 打开run.bat运行bot
 
-5. 配置你的机器人添加一个 *ws://127.0.0.1:8080/* 的配置
+5. 配置你的机器人添加一个 *ws://127.0.0.1:8080/cqhttp/ws* 的配置
 
       我相信看这个的应该都是已经领养好獭獭的用户了吧？如果不是看[文档](https://yimo0908.github.io/easy-build-otterbot/)
   
@@ -66,9 +66,9 @@
             reverseHost: 127.0.0.1
             reversePort: 8080
             accessToken: ''
-            reversePath: '/ws'
-            reverseApiPath: '/api'
-            reverseEventPath: '/event'
+            reversePath: '/cqhttp/ws'
+            reverseApiPath: '/cqhttp/api'
+            reverseEventPath: '/cqhttp/event'
             useUniversal: true
             useTLS: false
             reconnectInterval: 3000
