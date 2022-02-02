@@ -1,6 +1,6 @@
 import nonebot
 from nonebot import on_command
-from nonebot.adapters.cqhttp import Bot, Event
+from nonebot.adapters.onebot.v11 import Bot, Event
 from nonebot.log import logger
 
 from .config import Config

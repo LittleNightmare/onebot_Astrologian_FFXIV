@@ -1,3 +1,1 @@
-nonebot2==2.0.0a9
-
-pydantic~=1.7.3
+nonebot2==2.0.0b1

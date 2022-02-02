@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import nonebot
-from nonebot.adapters.cqhttp import Bot as CQHTTPBot
+from nonebot.adapters.onebot.v11 import Adapter as OneBot_V11_Adapter
 
 # Custom your logger
 # 
@@ -18,9 +18,9 @@ nonebot.init()
 app = nonebot.get_asgi()
 
 driver = nonebot.get_driver()
-driver.register_adapter("cqhttp", CQHTTPBot)
-nonebot.load_builtin_plugins()
-nonebot.load_plugins("nonebot_plugin_astrologian/plugins")
+driver.register_adapter(OneBot_V11_Adapter)
+nonebot.load_builtin_plugins("echo")
+
 
 # Modify some config / config depends on loaded configs
 # 
