@@ -2,7 +2,7 @@ import nonebot
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Bot, Event
 from nonebot.log import logger
-
+from nonebot.params import State
 from .config import Config
 from .data_source import luck_daily
 
@@ -13,7 +13,7 @@ group: bool = True
 
 
 @luck.handle()
-async def handle_first_receive(bot: Bot, event: Event, state: dict):
+async def handle_first_receive(bot: Bot, event: Event, state: dict=State()):
     # 通过是否为group判读信息结构
     global group
     group = True if event.get_event_name().find("group") != -1 else plugin_config.same_message_structure
@@ -35,7 +35,7 @@ async def handle_first_receive(bot: Bot, event: Event, state: dict):
 
 
 @luck.got("redraw")
-async def ordered_redraw(bot: Bot, event: Event, state: dict):
+async def ordered_redraw(bot: Bot, event: Event, state: dict=State()):
     if state["redraw"]:
         await luck.send(message="开拓命运吧", at_sender=group)
         await luck.finish(await luck_daily(user_id=int(event.get_user_id()), redraw=True, group_message=group),
@@ -43,7 +43,7 @@ async def ordered_redraw(bot: Bot, event: Event, state: dict):
 
 
 @luck.got("help")
-async def luck_help(bot: Bot, event: Event, state: dict):
+async def luck_help(bot: Bot, event: Event, state: dict=State()):
     if state["help"]:
         await luck.finish("使用命令/luck，/占卜，/zhanbu获得日常占卜结果\n"
                           "对结果不满意，可以使用\"/luck r\"来重抽\n"
@@ -51,7 +51,7 @@ async def luck_help(bot: Bot, event: Event, state: dict):
 
 
 @luck.got("test", prompt="参数？")
-async def luck_test(bot: Bot, event: Event, state: dict):
+async def luck_test(bot: Bot, event: Event, state: dict=State()):
     if state["test"] != "":
         test_id = state["test"]
         logger.debug("test" + ": " + test_id)
