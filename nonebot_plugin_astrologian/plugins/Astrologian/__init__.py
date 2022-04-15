@@ -33,7 +33,7 @@ async def handle_first_receive(event: Event, state: T_State, args: Message = Com
             state["test"] = args[1]
 
     else:
-        await luck.send(await luck_daily(user_id=int(event.get_user_id()), redraw=False, group_message=group),
+        await luck.finish(await luck_daily(user_id=int(event.get_user_id()), redraw=False, group_message=group),
                         at_sender=group)
 
 
