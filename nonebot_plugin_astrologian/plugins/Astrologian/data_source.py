@@ -12,13 +12,13 @@ EVENT_LIST: list = []
 
 EVENT_LIST_CONTENT: dict = {}
 
-war, magic, land, hand, stains = [], [], [], [], []
+war, magic, land, hand, stains, job_role = [], [], [], [], [], [[], [], [], [], []]
 
 
 async def initialization():
-    global war, magic, land, hand, stains, EVENT_LIST_CONTENT, EVENT_LIST
+    global war, magic, land, hand, stains, job_role, EVENT_LIST_CONTENT, EVENT_LIST
     # create constant vars
-    war, magic, land, hand = await get_jobs()
+    war, magic, land, hand, job_role = await get_jobs()
     stains = await get_stain()
     EVENT_LIST_CONTENT = await _get_event()
     EVENT_LIST = list(EVENT_LIST_CONTENT.keys())
@@ -31,6 +31,8 @@ async def get_jobs() -> tuple:
     magic_jobs = []
     land_jobs = []
     hand_jobs = []
+    # 生产采集，坦克，近战，远程，治疗，分别为0-4
+    jobs_role = [[], [], [], [], []]
     with open(PATH_Astrologian / "data" / "ClassJob.csv", mode="r", encoding="utf-8") as f:
         jobs_csv = csv.reader(f)
         for job in jobs_csv:
@@ -38,15 +40,19 @@ async def get_jobs() -> tuple:
                 if job[1] == job[39].split("之")[0]:
                     # print(job[1])
                     war_jobs.append(job[1])
+                    jobs_role[int(job[31])].append(job[1])
             elif job[4] == "魔法导师":
                 if job[1] == job[39].split("之")[0]:
                     # print(job[1])
                     magic_jobs.append(job[1])
+                    jobs_role[int(job[31])].append(job[1])
             elif job[4] == "能工巧匠":
                 hand_jobs.append(job[1])
+                jobs_role[int(job[31])].append(job[1])
             elif job[4] == "大地使者":
                 land_jobs.append(job[1])
-    return war_jobs, magic_jobs, land_jobs, hand_jobs
+                jobs_role[int(job[31])].append(job[1])
+    return war_jobs, magic_jobs, land_jobs, hand_jobs, jobs_role
 
 
 # 读取染剂列表
@@ -76,8 +82,10 @@ async def sub_event(key: str) -> str:
     if key == "舞者":
         partner = war + magic
         return key + "--> 最佳舞伴: " + random.choice(partner)
-    else:
-        return key
+    elif key == "贤者":
+        partner = job_role[1]
+        return key + "--> 最佳奶伴: " + random.choice(partner)
+    return key
 
 
 # copy from https://github.com/Bluefissure/OtterBot
