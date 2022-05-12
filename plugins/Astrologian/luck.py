@@ -7,7 +7,7 @@ from . import utils
 
 
 # on_command 装饰器将函数声明为一个命令处理器
-@on_command('luck', aliases=('占卜', 'zhanbu'), permission=EVERYBODY, only_to_me=False)
+@on_command('/zhanbu', aliases=('/占卜'), permission=EVERYBODY, only_to_me=False)
 async def luck(session: CommandSession):
     if len(utils.war or utils.magic or utils.land or utils.hand or utils.stains) == 0:
         await utils.initialization()
